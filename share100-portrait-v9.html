@@ -20,17 +20,20 @@ function exportPNG(){
 let rows;try{rows=getRows()}catch(e){alert(e.message);return}
 const name=$('itemName').value.trim(),date=$('itemDate').value,total=Number($('amount').value);
 if(!name||!date){alert('กรุณากรอกชื่อและวันที่');return}
-const W=600,H=Math.max(1067,355+rows.length*185+240),c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');
+const W=600,H=Math.max(1067,400+rows.length*84+195),c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');
 ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#d99b00';ctx.fillRect(0,0,W,12);ctx.textBaseline='middle';
-function txt(v,max,size=27,weight='normal'){let t=String(v);while(size>16){ctx.font=weight+' '+size+'px sans-serif';if(ctx.measureText(t).width<=max)break;size--}ctx.font=weight+' '+size+'px sans-serif';while(ctx.measureText(t).width>max&&t.length>2)t=t.slice(0,-2)+'…';return t}
-ctx.textAlign='left';ctx.fillStyle='#9b7100';ctx.font='bold 19px sans-serif';ctx.fillText('SHARE100 / EXPENSE SUMMARY',32,66);
-ctx.fillStyle='#26221b';ctx.fillText(txt(name,530,37,'bold'),32,126);
-ctx.fillStyle='#777';ctx.font='21px sans-serif';ctx.fillText('วันที่ '+dateThai(date),32,175);
-ctx.strokeStyle='#e8dfce';ctx.beginPath();ctx.moveTo(32,215);ctx.lineTo(568,215);ctx.stroke();
-rows.forEach((r,i)=>{const y=245+i*185;ctx.fillStyle='#f8f5ed';ctx.fillRect(32,y,536,169);ctx.textAlign='left';ctx.fillStyle='#29251d';ctx.fillText(txt(r.name,490,29,'bold'),48,y+38);ctx.fillStyle='#80766a';ctx.font='21px sans-serif';ctx.fillText('สัดส่วน '+r.pct+'%',48,y+81);ctx.fillStyle='#a07100';ctx.fillText(txt('฿'+money(r.amount),490,31,'bold'),48,y+132)});
-const y=270+rows.length*185;ctx.fillStyle='#fff0bf';ctx.fillRect(32,y,536,118);ctx.fillStyle='#28231b';ctx.textAlign='left';ctx.font='bold 24px sans-serif';ctx.fillText('ยอดรวม',48,y+33);ctx.fillText(txt('฿'+money(total),490,33,'bold'),48,y+79);
-ctx.fillStyle='#999';ctx.textAlign='center';ctx.font='18px sans-serif';ctx.fillText('สร้างด้วย Share100 · หารง่าย จ่ายตรงส่วน',W/2,H-40);
-c.toBlob(blob=>{if(!blob){alert('ไม่สามารถสร้างรูปภาพได้');return}const filename='Share100-Portrait-'+date+'-'+Date.now()+'.png',file=new File([blob],filename,{type:'image/png'}),url=URL.createObjectURL(blob);if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).catch(()=>{const a=document.createElement('a');a.href=url;a.download=filename;a.click()})}else{const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)},'image/png')
+function fitted(value,maxWidth,size=25,weight='normal',min=15){let str=String(value);while(size>min){ctx.font=weight+' '+size+'px sans-serif';if(ctx.measureText(str).width<=maxWidth)break;size--}ctx.font=weight+' '+size+'px sans-serif';while(ctx.measureText(str).width>maxWidth&&str.length>2)str=str.slice(0,-2)+'…';return str}
+ctx.textAlign='left';ctx.fillStyle='#9b7100';ctx.font='bold 18px sans-serif';ctx.fillText('SHARE100 / EXPENSE SUMMARY',32,64);
+ctx.fillStyle='#25231e';ctx.fillText(fitted(name,536,38,'bold',22),32,125);
+ctx.fillStyle='#777';ctx.font='20px sans-serif';ctx.fillText('วันที่ '+dateThai(date),32,177);
+ctx.strokeStyle='#e8dfce';ctx.beginPath();ctx.moveTo(32,218);ctx.lineTo(568,218);ctx.stroke();
+ctx.fillStyle='#8b877c';ctx.textAlign='left';ctx.font='bold 19px sans-serif';ctx.fillText('สมาชิก',32,265);
+ctx.textAlign='center';ctx.fillText('สัดส่วน',360,265);
+ctx.textAlign='right';ctx.fillText('จำนวนเงิน',552,265);
+rows.forEach((r,i)=>{const y=327+i*84;ctx.fillStyle='#25231e';ctx.textAlign='left';ctx.fillText(fitted(r.name,232,24,'normal',16),32,y);ctx.fillStyle='#777';ctx.textAlign='center';ctx.fillText(fitted(r.pct+'%',95,22,'normal',16),360,y);ctx.fillStyle='#25231e';ctx.textAlign='right';ctx.fillText(fitted('฿'+money(r.amount),156,23,'bold',15),552,y);ctx.strokeStyle='#eee8df';ctx.beginPath();ctx.moveTo(32,y+39);ctx.lineTo(568,y+39);ctx.stroke()});
+const y=365+rows.length*84;ctx.fillStyle='#fff1c8';ctx.fillRect(32,y,536,105);ctx.textAlign='left';ctx.fillStyle='#29251e';ctx.font='bold 25px sans-serif';ctx.fillText('ยอดรวม',48,y+53);ctx.textAlign='right';ctx.fillText(fitted('฿'+money(total),286,28,'bold',17),552,y+53);
+ctx.textAlign='center';ctx.fillStyle='#999';ctx.fillText(fitted('สร้างด้วย Share100 · หารง่าย จ่ายตรงส่วน',W-64,18,'normal',15),W/2,H-43);
+c.toBlob(blob=>{if(!blob){alert('ไม่สามารถสร้างรูปภาพได้');return}const filename='Share100-Compact-'+date+'-'+Date.now()+'.png',file=new File([blob],filename,{type:'image/png'}),url=URL.createObjectURL(blob);if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).catch(()=>{const a=document.createElement('a');a.href=url;a.download=filename;a.click()})}else{const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)},'image/png')
 }
 document.addEventListener('click',function(e){const b=e.target.closest('button');if(!b)return;const action=b.getAttribute('onclick')||'';if(/^removeItem\(\)/.test(action)&&!window.confirm('ต้องการลบรายการนี้ใช่หรือไม่?')){e.preventDefault();e.stopImmediatePropagation()}},true);
-renderHome();if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=9',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}))}</script></body></html>
+renderHome();if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=10',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}))}</script></body></html>
