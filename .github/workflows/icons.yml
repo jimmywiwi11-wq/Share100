@@ -31,5 +31,7 @@ jobs:
           git add icon-192.png icon-512.png
           if ! git diff --cached --quiet; then
             git commit -m "Render updated Share100 percentage app icons"
-            git push
+            git fetch origin main
+            git rebase origin/main
+            git push origin HEAD:main
           fi
