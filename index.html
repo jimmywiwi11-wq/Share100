@@ -20,18 +20,17 @@ function exportPNG(){
 let rows;try{rows=getRows()}catch(e){alert(e.message);return}
 const name=$('itemName').value.trim(),date=$('itemDate').value,total=Number($('amount').value);
 if(!name||!date){alert('กรุณากรอกชื่อและวันที่');return}
-const W=750,H=Math.max(1334,470+rows.length*160+290),c=document.createElement('canvas');c.width=W;c.height=H;
-const ctx=c.getContext('2d');ctx.fillStyle='#ffffff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#d99b00';ctx.fillRect(0,0,W,12);ctx.textBaseline='middle';
-function fitted(value,maxWidth,size,weight='normal',min=18){let str=String(value);while(size>min){ctx.font=weight+' '+size+'px sans-serif';if(ctx.measureText(str).width<=maxWidth)break;size--}ctx.font=weight+' '+size+'px sans-serif';while(ctx.measureText(str).width>maxWidth&&str.length>2)str=str.slice(0,-2)+'…';return str}
-ctx.textAlign='left';ctx.fillStyle='#9b7100';ctx.font='bold 22px sans-serif';ctx.fillText('SHARE100  /  EXPENSE SUMMARY',40,78);
-ctx.fillStyle='#24221e';ctx.fillText(fitted(name,670,44,'bold',25),40,150);
-ctx.fillStyle='#777';ctx.font='24px sans-serif';ctx.fillText('วันที่ '+dateThai(date),40,205);
-ctx.strokeStyle='#e8e0d0';ctx.beginPath();ctx.moveTo(40,250);ctx.lineTo(710,250);ctx.stroke();
-ctx.fillStyle='#8b877c';ctx.font='bold 23px sans-serif';ctx.fillText('รายละเอียดค่าใช้จ่าย',40,305);
-rows.forEach((r,i)=>{const top=350+i*160;ctx.fillStyle='#faf8f3';ctx.fillRect(40,top,670,138);ctx.fillStyle='#25231e';ctx.textAlign='left';ctx.fillText(fitted(r.name,395,29,'bold',20),58,top+39);ctx.fillStyle='#8a806d';ctx.font='23px sans-serif';ctx.fillText(fitted('สัดส่วน '+r.pct+'%',380,23),58,top+100);ctx.textAlign='right';ctx.fillStyle='#9b7100';ctx.fillText(fitted('฿'+money(r.amount),250,29,'bold',18),690,top+88)});
-const top=370+rows.length*160;ctx.fillStyle='#fff2c8';ctx.fillRect(40,top,670,126);ctx.textAlign='left';ctx.fillStyle='#3c3119';ctx.font='bold 27px sans-serif';ctx.fillText('ยอดรวม',60,top+62);ctx.textAlign='right';ctx.fillText(fitted('฿'+money(total),420,36,'bold',20),690,top+62);
-ctx.textAlign='center';ctx.fillStyle='#999';ctx.font='20px sans-serif';ctx.fillText('สร้างด้วย Share100 · หารง่าย จ่ายตรงส่วน',W/2,H-58);
-c.toBlob(blob=>{if(!blob){alert('ไม่สามารถสร้างรูปภาพได้');return}const url=URL.createObjectURL(blob),filename='Share100-'+date+'.png',file=new File([blob],filename,{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).catch(()=>window.open(url,'_blank'))}else{const link=document.createElement('a');link.href=url;link.download=filename;document.body.appendChild(link);link.click();link.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)},'image/png')
+const W=600,H=Math.max(1067,355+rows.length*185+240),c=document.createElement('canvas');c.width=W;c.height=H;const ctx=c.getContext('2d');
+ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#d99b00';ctx.fillRect(0,0,W,12);ctx.textBaseline='middle';
+function txt(v,max,size=27,weight='normal'){let t=String(v);while(size>16){ctx.font=weight+' '+size+'px sans-serif';if(ctx.measureText(t).width<=max)break;size--}ctx.font=weight+' '+size+'px sans-serif';while(ctx.measureText(t).width>max&&t.length>2)t=t.slice(0,-2)+'…';return t}
+ctx.textAlign='left';ctx.fillStyle='#9b7100';ctx.font='bold 19px sans-serif';ctx.fillText('SHARE100 / EXPENSE SUMMARY',32,66);
+ctx.fillStyle='#26221b';ctx.fillText(txt(name,530,37,'bold'),32,126);
+ctx.fillStyle='#777';ctx.font='21px sans-serif';ctx.fillText('วันที่ '+dateThai(date),32,175);
+ctx.strokeStyle='#e8dfce';ctx.beginPath();ctx.moveTo(32,215);ctx.lineTo(568,215);ctx.stroke();
+rows.forEach((r,i)=>{const y=245+i*185;ctx.fillStyle='#f8f5ed';ctx.fillRect(32,y,536,169);ctx.textAlign='left';ctx.fillStyle='#29251d';ctx.fillText(txt(r.name,490,29,'bold'),48,y+38);ctx.fillStyle='#80766a';ctx.font='21px sans-serif';ctx.fillText('สัดส่วน '+r.pct+'%',48,y+81);ctx.fillStyle='#a07100';ctx.fillText(txt('฿'+money(r.amount),490,31,'bold'),48,y+132)});
+const y=270+rows.length*185;ctx.fillStyle='#fff0bf';ctx.fillRect(32,y,536,118);ctx.fillStyle='#28231b';ctx.textAlign='left';ctx.font='bold 24px sans-serif';ctx.fillText('ยอดรวม',48,y+33);ctx.fillText(txt('฿'+money(total),490,33,'bold'),48,y+79);
+ctx.fillStyle='#999';ctx.textAlign='center';ctx.font='18px sans-serif';ctx.fillText('สร้างด้วย Share100 · หารง่าย จ่ายตรงส่วน',W/2,H-40);
+c.toBlob(blob=>{if(!blob){alert('ไม่สามารถสร้างรูปภาพได้');return}const filename='Share100-Portrait-'+date+'-'+Date.now()+'.png',file=new File([blob],filename,{type:'image/png'}),url=URL.createObjectURL(blob);if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).catch(()=>{const a=document.createElement('a');a.href=url;a.download=filename;a.click()})}else{const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove()}setTimeout(()=>URL.revokeObjectURL(url),60000)},'image/png')
 }
 document.addEventListener('click',function(e){const b=e.target.closest('button');if(!b)return;const action=b.getAttribute('onclick')||'';if(/^removeItem\(\)/.test(action)&&!window.confirm('ต้องการลบรายการนี้ใช่หรือไม่?')){e.preventDefault();e.stopImmediatePropagation()}},true);
-renderHome();if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=8',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}))}</script></body></html>
+renderHome();if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js?v=9',{updateViaCache:'none'}).then(r=>r.update()).catch(()=>{}))}</script></body></html>
