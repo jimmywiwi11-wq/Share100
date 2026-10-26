@@ -27,11 +27,13 @@ ctx.scale(scale,scale);ctx.textBaseline='middle';
 ctx.fillStyle='#fff';ctx.fillRect(0,0,W,H);ctx.fillStyle='#d99b00';ctx.fillRect(0,0,W,8);
 function draw(value,x,y,width,size,color,weight='normal',align='left'){
   let t=String(value),fontSize=size;
-  ctx.textAlign=align;ctx.fillStyle=color;
+  ctx.textAlign='left';ctx.direction='ltr';ctx.fillStyle=color;
   while(fontSize>12){ctx.font=weight+' '+fontSize+'px system-ui, sans-serif';if(ctx.measureText(t).width<=width)break;fontSize--}
   ctx.font=weight+' '+fontSize+'px system-ui, sans-serif';
   if(ctx.measureText(t).width>width){while(t.length>1&&ctx.measureText(t+'…').width>width)t=t.slice(0,-1);t+='…'}
-  ctx.fillText(t,x,y);
+  const measured=ctx.measureText(t).width;
+  const left=align==='right'?x-measured:align==='center'?x-measured/2:x;
+  ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();ctx.fillText(t,Math.max(PAD,Math.min(left,W-PAD-measured)),y);ctx.restore();
 }
 draw('SHARE100 / EXPENSE SUMMARY',PAD,41,346,13,'#9b7100','bold');
 draw(name,PAD,83,346,28,'#24221e','bold');
@@ -53,14 +55,14 @@ ctx.fillStyle='#fff1c8';ctx.fillRect(PAD,summaryY,W-2*PAD,78);
 draw('ยอดรวม',PAD+12,summaryY+39,105,18,'#29251e','bold');
 draw('฿'+money(total),W-PAD-12,summaryY+39,190,21,'#29251e','bold','right');
 draw('สร้างด้วย Share100 · หารง่าย จ่ายตรงส่วน',W/2,H-45,W-2*PAD,12,'#999','normal','center');
-draw('PNG NEW v14',W/2,H-22,100,11,'#aaa','normal','center');
+draw('PNG NEW v15',W/2,H-22,100,11,'#aaa','normal','center');
 canvas.toBlob(blob=>{
  if(!blob){alert('ไม่สามารถสร้างรูปภาพได้');return}
- const filename='Share100-NEW-v14-'+date+'-'+Date.now()+'.png',file=new File([blob],filename,{type:'image/png'}),url=URL.createObjectURL(blob);
+ const filename='Share100-NEW-v15-'+date+'-'+Date.now()+'.png',file=new File([blob],filename,{type:'image/png'}),url=URL.createObjectURL(blob);
  function download(){const a=document.createElement('a');a.href=url;a.download=filename;document.body.appendChild(a);a.click();a.remove()}
  if(navigator.canShare&&navigator.canShare({files:[file]})){navigator.share({files:[file],title:name}).catch(err=>{if(err.name!=='AbortError')download()})}else download();
  setTimeout(()=>URL.revokeObjectURL(url),60000)
 },'image/png')
 }
 document.addEventListener('click',function(e){const b=e.target.closest('button');if(!b)return;const action=b.getAttribute('onclick')||'';if(/^removeItem\(\)/.test(action)&&!window.confirm('ต้องการลบรายการนี้ใช่หรือไม่?')){e.preventDefault();e.stopImmediatePropagation()}},true);
-renderHome();document.querySelectorAll('button[onclick="exportPNG()"],a[onclick="exportPNG()"]') .forEach(b=>{b.textContent='ส่งออก PNG ใหม่ (v14)'});const versionTag=document.createElement('div');versionTag.textContent='Share100 · เวอร์ชัน 14';versionTag.style.cssText='position:fixed;bottom:8px;right:8px;background:#fff4ce;color:#7b5700;border:1px solid #d99b00;border-radius:10px;padding:5px 9px;font:12px sans-serif;z-index:9999;pointer-events:none';document.body.appendChild(versionTag);if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.filter(r=>r.scope.includes('/Share100/')).map(r=>r.unregister()));if('caches' in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('share100-pwa-')).map(k=>caches.delete(k)))}if(!sessionStorage.getItem('share100-v14-cleaned')){sessionStorage.setItem('share100-v14-cleaned','1');location.replace(location.pathname+'?v=14&fresh='+Date.now())}}catch(e){console.warn('Cache refresh:',e)}})}</script></body></html>
+renderHome();document.querySelectorAll('button[onclick="exportPNG()"],a[onclick="exportPNG()"]') .forEach(b=>{b.textContent='ส่งออก PNG ใหม่ (v15)'});const versionTag=document.createElement('div');versionTag.textContent='Share100 · เวอร์ชัน 15';versionTag.style.cssText='position:fixed;bottom:8px;right:8px;background:#fff4ce;color:#7b5700;border:1px solid #d99b00;border-radius:10px;padding:5px 9px;font:12px sans-serif;z-index:9999;pointer-events:none';document.body.appendChild(versionTag);if('serviceWorker' in navigator){window.addEventListener('load',async()=>{try{const regs=await navigator.serviceWorker.getRegistrations();await Promise.all(regs.filter(r=>r.scope.includes('/Share100/')).map(r=>r.unregister()));if('caches' in window){const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith('share100-pwa-')).map(k=>caches.delete(k)))}if(!sessionStorage.getItem('share100-v15-cleaned')){sessionStorage.setItem('share100-v14-cleaned','1');location.replace(location.pathname+'?v=15&fresh='+Date.now())}}catch(e){console.warn('Cache refresh:',e)}})}</script></body></html>
